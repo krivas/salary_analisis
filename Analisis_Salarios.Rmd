@@ -2,29 +2,75 @@
 title: "Analaisis_Salarios"
 author: "Kevin Rivas y John Astwood"
 date: "2023-08-15"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(dplyr)
+library(corrplot)
+library(forcats)
 ```
 
 ## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
 ```{r cars}
-summary(cars)
+# Set the working directory to the location of the CSV file
+setwd("/Users/kevinrivas/Documents/R")
+
+# Read the CSV file
+data <- read.csv("data_salarios.csv")  # Replace "filename.csv" with the actual CSV file's name
+data <- subset(data, age <= 70 & age>=18)
+data
+
 ```
 
 ## Including Plots
 
 You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r pressure}
+colSums(is.na(data))
+
+
+ggplot(data, aes(y = fct_lump(factor(job_simp), n = 25))) +
+  geom_bar(stat = "count") +
+  theme_minimal()
+
+ggplot(data, aes(y = fct_lump(factor(Salary.Estimate), n = 20))) +
+  geom_bar(stat = "count") +
+  theme_minimal()
+
+ggplot(data, aes(x = age, y = avg_salary)) +
+  geom_point(color = "steelblue") +
+  ggtitle("Age vs. Average Salary") +
+  xlab("Age") +
+  ylab("Average Salary") +
+  theme_minimal()
+
+ggplot(data, aes(y = age)) +
+  geom_boxplot(fill = "steelblue") +
+  ggtitle("Box Plot of Age") +
+  ylab("Age") +
+  theme_minimal()
+
+
+# Seleccionar solo las variables numéricas
+numeric_vars <- select_if(data, is.numeric)
+
+# Calcular la matriz de correlación para variables numéricas
+correlation_matrix <- cor(numeric_vars)
+
+# Mostrar la matriz de correlación utilizando corrplot
+correlation_matrix
+# Perform linear regression
+reg_model <- lm(avg_salary ~ job_state +excel+python_yn+R_yn +job_simp,data= data)
+
+# Print the summary of the regression model
+summary(reg_model)
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
