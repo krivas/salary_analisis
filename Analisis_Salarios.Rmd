@@ -1,5 +1,5 @@
 ---
-title: "Analaisis_Salarios"
+title: "Análisis Salarios"
 author: "Kevin Rivas y John Astwood"
 date: "2023-08-15"
 output:
@@ -17,7 +17,7 @@ library(forcats)
 
 ## R Markdown
 
-```{r cars}
+```{r cars,include=FALSE}
 # Set the working directory to the location of the CSV file
 setwd("/Users/kevinrivas/Documents/R")
 
@@ -28,7 +28,6 @@ data <- subset(data, age <= 70 & age>=18)
 
 ```
 
-## Graficos
 
 ```{r pressure}
 colSums(is.na(data))
@@ -42,12 +41,23 @@ ggplot(data, aes(y = fct_lump(factor(Salary.Estimate), n = 20))) +
   geom_bar(stat = "count") +
   theme_minimal()
 
+ggplot(data, aes(x = avg_salary, y = job_state)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  ggtitle("Job State vs. Average Salary") +
+  ylab("Job State") +
+  xlab("Average Salary") +
+  theme_minimal() 
+
+
+
+
 ggplot(data, aes(x = age, y = avg_salary)) +
   geom_point(color = "steelblue") +
   ggtitle("Age vs. Average Salary") +
   xlab("Age") +
   ylab("Average Salary") +
   theme_minimal()
+
 
 ggplot(data, aes(y = age)) +
   geom_boxplot(fill = "steelblue") +
@@ -63,7 +73,7 @@ numeric_vars <- select_if(data, is.numeric)
 correlation_matrix <- cor(numeric_vars)
 
 # Mostrar la matriz de correlación utilizando corrplot
-correlation_matrix
+corrplot(correlation_matrix, method = "color")
 # Perform linear regression
 reg_model <- lm(avg_salary ~ job_state +excel+python_yn+R_yn +job_simp,data= data)
 
