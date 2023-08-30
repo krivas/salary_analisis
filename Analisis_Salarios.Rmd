@@ -3,8 +3,8 @@ title: "Analaisis_Salarios"
 author: "Kevin Rivas y John Astwood"
 date: "2023-08-15"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -24,13 +24,11 @@ setwd("/Users/kevinrivas/Documents/R")
 # Read the CSV file
 data <- read.csv("data_salarios.csv")  # Replace "filename.csv" with the actual CSV file's name
 data <- subset(data, age <= 70 & age>=18)
-data
+
 
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
+## Graficos
 
 ```{r pressure}
 colSums(is.na(data))
