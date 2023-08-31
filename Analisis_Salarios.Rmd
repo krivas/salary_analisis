@@ -48,7 +48,7 @@ ggplot(data, aes(x = avg_salary, y = job_state)) +
   xlab("Average Salary") +
   theme_minimal() 
 
-
+#agregar comentario
 
 
 ggplot(data, aes(x = age, y = avg_salary)) +
