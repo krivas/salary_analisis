@@ -1,84 +1,54 @@
 ---
-title: "Análisis Salarios"
+title: "Análisis Diabetes"
 author: "Kevin Rivas y John Astwood"
 date: "2023-08-15"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(ggplot2)
+install.packages('datasets')
+install.packages('caTools')
+install.packages('party')
+install.packages('dplyr')
+install.packages('magrittr')
+install.packages("rpart.plot")
+library(datasets)
+library(caTools)
+library(party)
 library(dplyr)
-library(corrplot)
-library(forcats)
+library(magrittr)
+library(rpart.plot)
 ```
 
 ## R Markdown
 
 ```{r cars,include=FALSE}
 # Set the working directory to the location of the CSV file
-setwd("/Users/kevinrivas/Documents/R")
-
 # Read the CSV file
 data <- read.csv("data_salarios.csv")  # Replace "filename.csv" with the actual CSV file's name
 data <- subset(data, age <= 70 & age>=18)
-
-
+data2 <- read.csv("data2.csv")
 ```
 
+```{r}
+data2 <- read.csv("data2.csv")
+set.seed(123)
+sample_data = sample.split(data2, SplitRatio = 0.7)
+train_data <- subset(data2, sample_data == TRUE)
+test_data <- subset(data2, sample_data == FALSE)
 
-```{r pressure}
-colSums(is.na(data))
+fit <- rpart(Diabetes_binary ~. , data=train_data, method = 'class')
 
+rpart.plot(fit) 
 
-ggplot(data, aes(y = fct_lump(factor(job_simp), n = 25))) +
-  geom_bar(stat = "count") +
-  theme_minimal()
+predict_unseen <-predict(fit, test_data, type = 'class')
 
-ggplot(data, aes(y = fct_lump(factor(Salary.Estimate), n = 20))) +
-  geom_bar(stat = "count") +
-  theme_minimal()
+table_mat <- table(test_data$Diabetes_binary, predict_unseen)
+table_mat
+accuracy_Test <- sum(diag(table_mat)) / sum(table_mat)
+accuracy_Test
 
-ggplot(data, aes(x = avg_salary, y = job_state)) +
-  geom_bar(stat = "identity", fill = "steelblue") +
-  ggtitle("Job State vs. Average Salary") +
-  ylab("Job State") +
-  xlab("Average Salary") +
-  theme_minimal() 
-
-#agregar comentario
-
-
-ggplot(data, aes(x = age, y = avg_salary)) +
-  geom_point(color = "steelblue") +
-  ggtitle("Age vs. Average Salary") +
-  xlab("Age") +
-  ylab("Average Salary") +
-  theme_minimal()
-
-
-ggplot(data, aes(y = age)) +
-  geom_boxplot(fill = "steelblue") +
-  ggtitle("Box Plot of Age") +
-  ylab("Age") +
-  theme_minimal()
-
-
-# Seleccionar solo las variables numéricas
-numeric_vars <- select_if(data, is.numeric)
-
-# Calcular la matriz de correlación para variables numéricas
-correlation_matrix <- cor(numeric_vars)
-
-# Mostrar la matriz de correlación utilizando corrplot
-corrplot(correlation_matrix, method = "color")
-# Perform linear regression
-reg_model <- lm(avg_salary ~ job_state +excel+python_yn+R_yn +job_simp,data= data)
-
-# Print the summary of the regression model
-summary(reg_model)
 ```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
